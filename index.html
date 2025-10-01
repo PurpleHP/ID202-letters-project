@@ -3,43 +3,197 @@
   <head>
     <meta charset="utf-8">
     <title>Letters</title>
+      <style>
+        html, body {
+          height: 100%;
+          margin: 0;
+        }
+        #title {
+        position: relative;
+        width: 100%;
+        display: flex;
+        height: 5%;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: absolute
+      }
+      #output {
+        position: relative;
+        width: 100%;
+        min-height: 100%;
+        overflow: hidden;
+      }
+      .random-letter {
+        position: absolute;
+        font-size: 2rem;
+        user-select: none;
+      }
+      #chart {
+        width: 100%;
+        margin: 0 auto 20px auto;
+        height: 10%;
+        white-space: nowrap;     
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        position: absolute;
+        margin-top: 15vh;
+      }
+      .bar {
+        display: inline-block;
+        height: 5vh;
+        max-height: 5%;
+        margin-right: 2px;
+        background: #3498db;
+        vertical-align: bottom;
+        color: #fff;
+        text-align: center;
+        font-size: 1rem;
+        border-radius: 3px 3px 0 0;
+      }
+      .bar-label {
+        display: block;
+        font-size: 0.8rem;
+        color: #333;
+        margin-top: 2px;
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
-    <h1>Letters: E Roon Kang</h1>
-    <p>We write from left to right but why?</p>
-    <div id="output"></div>
-<script>
-  // find the #output element
-  const outputEl = document.getElementById("output");
+    <h1 id="title">Letters: Mert Taylan</h1>
+    <div id="chart"></div>
+        <div id="output"></div>
+      <script>
+          const outputEl = document.getElementById("output");
+          const chartEl = document.getElementById("chart");
+          const charCounts = {};
 
-  function addDomElement(tag, attrs) {
-    const el = document.createElement(tag);
-    if (attrs) {
-      for (const k in attrs) {
-        if (k === "text") {
-          el.textContent = attrs[k];
-        } else {
-          el.setAttribute(k, attrs[k]);
-        }
-      }
-    }
-    outputEl.appendChild(el);
-    return el;
-  }
+          const possibleChars = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
 
-  // Listen for keydown events
-  document.addEventListener("keydown", function(event) {
-    console.log("Key pressed:", event.key);
-    if (event.key === "Backspace") {
-      if (outputEl.lastChild) {
-        outputEl.removeChild(outputEl.lastChild);
-      }
-    } else if (event.key === "d" || event.key === "D") {
-      addDomElement("span", { text: "BARK!" });
-    } else {
-      addDomElement("span", { text: event.key });
-    }
-  });
-</script>
+          function startFading(el) {
+            let opacity = 1;
+            const fadeInterval = setInterval(() => {
+              opacity -= 0.01;
+              if (opacity <= 0) {
+                clearInterval(fadeInterval);
+                if (el.parentNode) {
+                  el.parentNode.removeChild(el);
+                }
+              } else {
+                el.style.opacity = opacity;
+              }
+            }, 10);
+          }
+
+          function createCircleEffect(el) {
+            const rect = el.getBoundingClientRect();
+            const parentRect = outputEl.getBoundingClientRect();
+            const circle = document.createElement("div");
+            circle.style.position = "absolute";
+            circle.style.border = "2px solid rgba(0, 0, 0, 0.5)";
+            circle.style.borderRadius = "50%";
+            circle.style.width = "20px";
+            circle.style.height = "20px";
+            
+            circle.style.left = (rect.left - parentRect.left + rect.width / 2) + "px";
+            circle.style.top = (rect.top - parentRect.top + rect.height / 2) + "px";
+            circle.style.transform = "translate(-50%, -50%)";
+
+            outputEl.appendChild(circle);
+
+            let size = 20;
+            let opacity = 1;
+            const expandInterval = setInterval(() => {
+              size += 2;
+              opacity -= 0.02;
+              if (opacity <= 0) {
+                clearInterval(expandInterval);
+                if (circle.parentNode) circle.parentNode.removeChild(circle);
+              } else {
+                circle.style.width = size + "px";
+                circle.style.height = size + "px";
+                circle.style.opacity = opacity;
+              }
+            }, 10);
+          }
+
+
+          function addDomElement(tag, attrs) {
+            const el = document.createElement(tag);
+            if (attrs) {
+              for (const k in attrs) {
+                if (k === "text") {
+                  el.textContent = attrs[k];
+                } else {
+                  el.setAttribute(k, attrs[k]);
+                }
+              }
+            }
+            el.classList.add("random-letter");
+            const outputRect = outputEl.getBoundingClientRect();
+            const maxLeft = outputRect.width - 40;
+            const maxTop = outputRect.height - 40;
+            el.style.left = Math.random() * maxLeft + "px";
+            el.style.top = Math.random() * maxTop + "px";
+            outputEl.appendChild(el);
+            createCircleEffect(el);
+            startFading(el);
+            return el;
+          }
+
+          function updateChart() {
+            const used = Object.entries(charCounts);
+            used.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+            const usedChars = used.map(([c]) => c);
+            let chartData = [...used];
+            if (chartData.length < 10) {
+              const unused = possibleChars.filter(c => !usedChars.includes(c));
+              for (let i = unused.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [unused[i], unused[j]] = [unused[j], unused[i]];
+              }
+              for (let i = 0; i < 10 - chartData.length && i < unused.length; i++) {
+                chartData.push([unused[i], 0]);
+              }
+            }
+            chartData = chartData.slice(0, 10);
+            const maxCount = chartData.length ? Math.max(...chartData.map(([_, c]) => c)) : 1;
+            chartEl.innerHTML = '';
+            chartData.forEach(([char, count]) => {
+                const barContainer = document.createElement('div');
+                barContainer.style.display = 'inline-flex';
+                barContainer.style.flexDirection = 'column';
+                barContainer.style.alignItems = 'center';
+                barContainer.style.marginRight = '2px';
+
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.width = '24px';
+                bar.style.height = (maxCount ? (count / maxCount * 100 + 20) : 20) + 'px';
+                bar.title = char;
+
+                const label = document.createElement('span');
+                label.className = 'bar-label';
+                label.textContent = char;
+
+                barContainer.appendChild(bar);
+                barContainer.appendChild(label);
+
+                chartEl.appendChild(barContainer);
+              });
+
+
+          }
+
+          document.addEventListener("keydown", function(event) {
+            if (event.key.length === 1) {
+              addDomElement("span", { text: event.key });
+              charCounts[event.key] = (charCounts[event.key] || 0) + 1;
+              updateChart();
+            }
+          });
+        </script>
   </body>
 </html>
