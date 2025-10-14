@@ -1,378 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
   <head>
     <meta charset="utf-8">
-    <title>Letters</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        min-height: 100vh;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        overflow: hidden;
-        position: relative;
-      }
-
-      body::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: 
-          radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-        pointer-events: none;
-      }
-
-      #title {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        padding: 2rem;
-        text-align: center;
-        z-index: 100;
-      }
-
-      #title h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.5px;
-        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-      }
-
-      #title h3 {
-        font-size: 1rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.5px;
-        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-        margin-bottom: 5px;
-      }
-
-      #chart {
-        position: absolute;
-        top: 120px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 600px;
-        height: 200px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        border-radius: 24px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-        padding: 30px 20px 20px 20px;
-        gap: 8px;
-        z-index: 50;
-      }
-
-      .bar-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        flex: 1;
-        max-width: 50px;
-      }
-
-      .bar {
-        width: 100%;
-        min-height: 4px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
-        border-radius: 8px 8px 4px 4px;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .bar::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        animation: shimmer 2s infinite;
-      }
-
-      @keyframes shimmer {
-        to {
-          left: 100%;
-        }
-      }
-
-      .bar:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      }
-
-      .bar-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.9);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      #output {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
-
-      .random-letter {
-        position: absolute;
-        font-size: 3rem;
-        font-weight: 700;
-        user-select: none;
-        color: #fff;
-        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        animation: letterAppear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-
-      @keyframes letterAppear {
-        from {
-          transform: scale(0) rotate(-180deg);
-          opacity: 0;
-        }
-        to {
-          transform: scale(1) rotate(0deg);
-          opacity: 1;
-        }
-      }
-
-      .ripple {
-        position: absolute;
-        border: 3px solid rgba(255, 255, 255, 0.6);
-        border-radius: 50%;
-        pointer-events: none;
-        animation: rippleEffect 0.8s cubic-bezier(0, 0, 0.2, 1);
-      }
-
-      @keyframes rippleEffect {
-        from {
-          width: 0;
-          height: 0;
-          opacity: 1;
-        }
-        to {
-          width: 100px;
-          height: 100px;
-          opacity: 0;
-        }
-      }
-
-      .particle {
-        position: absolute;
-        width: 4px;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 50%;
-        pointer-events: none;
-        animation: particleFloat 1s ease-out forwards;
-      }
-
-      @keyframes particleFloat {
-        from {
-          opacity: 1;
-          transform: translate(0, 0) scale(1);
-        }
-        to {
-          opacity: 0;
-          transform: translate(var(--tx), var(--ty)) scale(0);
-        }
-      }
-
-      @media (max-width: 768px) {
-        #title h1 {
-          font-size: 1.75rem;
-        }
-
-        #chart {
-          top: 100px;
-          height: 160px;
-          padding: 20px 15px 15px 15px;
-        }
-
-        .random-letter {
-          font-size: 2rem;
-        }
-      }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity Web Player | ID202 Project 2 Unity</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
-    <div id="title">
-      <h1>Letters You Love Most</h1>
-      <h3>Mert Taylan</h1>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-logo-title-footer"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">ID202 Project 2 Unity</div>
+      </div>
     </div>
-    <div id="chart"></div>
-    <div id="output"></div>
-    
     <script>
-      const outputEl = document.getElementById("output");
-      const chartEl = document.getElementById("chart");
-      const charCounts = {};
-      const possibleChars = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
+      var canvas = document.querySelector("#unity-canvas");
 
-      function startFading(el) {
-        let opacity = 1;
-        const fadeInterval = setInterval(() => {
-          opacity -= 0.01;
-          if (opacity <= 0) {
-            clearInterval(fadeInterval);
-            if (el.parentNode) {
-              el.parentNode.removeChild(el);
-            }
-          } else {
-            el.style.opacity = opacity;
-          }
-        }, 10);
-      }
-
-      function createRippleEffect(x, y) {
-        const ripple = document.createElement("div");
-        ripple.className = "ripple";
-        ripple.style.left = x + "px";
-        ripple.style.top = y + "px";
-        ripple.style.transform = "translate(-50%, -50%)";
-        outputEl.appendChild(ripple);
-
-        setTimeout(() => {
-          if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
-        }, 800);
-      }
-
-      function createParticles(x, y) {
-        for (let i = 0; i < 6; i++) {
-          const particle = document.createElement("div");
-          particle.className = "particle";
-          const angle = (Math.PI * 2 * i) / 6;
-          const distance = 30 + Math.random() * 20;
-          const tx = Math.cos(angle) * distance;
-          const ty = Math.sin(angle) * distance;
-          
-          particle.style.left = x + "px";
-          particle.style.top = y + "px";
-          particle.style.setProperty('--tx', tx + 'px');
-          particle.style.setProperty('--ty', ty + 'px');
-          
-          outputEl.appendChild(particle);
-
-          setTimeout(() => {
-            if (particle.parentNode) particle.parentNode.removeChild(particle);
-          }, 1000);
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
         }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
       }
 
-      function addDomElement(tag, attrs) {
-        const el = document.createElement(tag);
-        if (attrs) {
-          for (const k in attrs) {
-            if (k === "text") {
-              el.textContent = attrs[k];
-            } else {
-              el.setAttribute(k, attrs[k]);
-            }
-          }
-        }
-        el.classList.add("random-letter");
-        const outputRect = outputEl.getBoundingClientRect();
-        const maxLeft = outputRect.width - 60;
-        const maxTop = outputRect.height - 60;
-        const left = Math.random() * maxLeft;
-        const top = Math.random() * maxTop;
-        
-        el.style.left = left + "px";
-        el.style.top = top + "px";
-        
-        outputEl.appendChild(el);
-        
-        const rect = el.getBoundingClientRect();
-        const parentRect = outputEl.getBoundingClientRect();
-        const centerX = rect.left - parentRect.left + rect.width / 2;
-        const centerY = rect.top - parentRect.top + rect.height / 2;
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/ID202-letters-project.loader.js";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/ID202-letters-project.data.br",
+        frameworkUrl: buildUrl + "/ID202-letters-project.framework.js.br",
+        codeUrl: buildUrl + "/ID202-letters-project.wasm.br",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "ID202 Project 2 Unity",
+        productVersion: "0.1.0",
+        showBanner: unityShowBanner,
+      };
 
-        createRippleEffect(centerX, centerY);
-        createParticles(centerX, centerY);
-        startFading(el);
-        
-        return el;
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
+      // This autosyncing is currently not the default behavior to avoid regressing
+      // existing user projects that might rely on the earlier manual
+      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
+      // expected to change.
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        document.querySelector("#unity-container").className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        canvas.style.width = "960px";
+        canvas.style.height = "600px";
       }
 
-      function updateChart() {
-        const used = Object.entries(charCounts);
-        used.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-        const usedChars = used.map(([c]) => c);
-        let chartData = [...used];
-        
-        if (chartData.length < 10) {
-          const unused = possibleChars.filter(c => !usedChars.includes(c));
-          for (let i = unused.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [unused[i], unused[j]] = [unused[j], unused[i]];
-          }
-          for (let i = 0; i < 10 - chartData.length && i < unused.length; i++) {
-            chartData.push([unused[i], 0]);
-          }
-        }
-        
-        chartData = chartData.slice(0, 10);
-        const maxCount = chartData.length ? Math.max(...chartData.map(([_, c]) => c)) : 1;
-        
-        chartEl.innerHTML = '';
-        chartData.forEach(([char, count]) => {
-          const barContainer = document.createElement('div');
-          barContainer.className = 'bar-container';
+      document.querySelector("#unity-loading-bar").style.display = "block";
 
-          const bar = document.createElement('div');
-          bar.className = 'bar';
-          const height = maxCount ? (count / maxCount * 100 + 20) : 20;
-          bar.style.height = height + 'px';
-          bar.title = `${char}: ${count}`;
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+              }).then((unityInstance) => {
+                document.querySelector("#unity-loading-bar").style.display = "none";
+                document.querySelector("#unity-fullscreen-button").onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
 
-          const label = document.createElement('span');
-          label.className = 'bar-label';
-          label.textContent = char;
+              }).catch((message) => {
+                alert(message);
+              });
+            };
 
-          barContainer.appendChild(bar);
-          barContainer.appendChild(label);
-          chartEl.appendChild(barContainer);
-        });
-      }
+      document.body.appendChild(script);
 
-      document.addEventListener("keydown", function(event) {
-        if (event.key.length === 1 && event.key != ' ') {
-          addDomElement("span", { text: event.key });
-          charCounts[event.key] = (charCounts[event.key] || 0) + 1;
-          updateChart();
-        }
-      });
-
-      updateChart();
     </script>
   </body>
 </html>
